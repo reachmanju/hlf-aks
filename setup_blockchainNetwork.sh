@@ -158,18 +158,6 @@ echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/create_channel.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/create_channel.yaml
 sleep 25
 
-JOBSTATUS=$(kubectl get jobs |grep createchannel |awk '{print $2}')
-while [ "${JOBSTATUS}" != "1/1 1/1" ]; do
-    echo "Waiting for createchannel job to be completed"
-    sleep 1;
-    if [ "$(kubectl get pods | grep createchannel | awk '{print $3}')" == "Error" ]; then
-        echo "Create Channel Failed"
-        exit 1
-    fi
-    JOBSTATUS=$(kubectl get jobs |grep createchannel |awk '{print $2}')
-done
-echo "Create Channel Completed Successfully"
-
 
 # Join all peers on a channel
 echo -e "\nCreating joinchannel job"
