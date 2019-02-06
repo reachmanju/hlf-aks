@@ -15,13 +15,13 @@ spec:
         persistentVolumeClaim:
           claimName: shared-pvc
       containers:
-      - name: chaincodeinstallnode
+      - name: chaincodeinstallnode1
         image: hyperledger/fabric-tools:1.2.1
         imagePullPolicy: Always
         command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -l node -p fabcar/"]
         env:
         - name: CHAINCODE_NAME
-          value: "cc"
+          value: "nodecc"
         - name: CHAINCODE_VERSION
           value: "1.0"
         - name: FABRIC_CFG_PATH
@@ -38,13 +38,13 @@ spec:
         - mountPath: /shared
           name: sharedvolume
 
-      - name: chaincodeinstall2
+      - name: chaincodeinstallnode2
         image: hyperledger/fabric-tools:1.2.1
         imagePullPolicy: Always
-        command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -p chaincode_example02/"]
+        command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -l node -p fabcar/"]
         env:
         - name: CHAINCODE_NAME
-          value: "cc"
+          value: "nodecc"
         - name: CHAINCODE_VERSION
           value: "1.0"
         - name: FABRIC_CFG_PATH
