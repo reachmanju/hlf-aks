@@ -116,6 +116,7 @@ done
 echo -e "\nCreating new Deployment to create four peers in network"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/peersDeployment.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/peersDeployment.yaml
+sleep 10
 
 echo "Checking if all deployments are ready"
 
@@ -143,6 +144,7 @@ sleep 10
 echo -e "\nCreating channel transaction artifact and a channel"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/create_channel.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/create_channel.yaml
+sleep 20
 
 JOBSTATUS=$(kubectl get jobs |grep createchannel |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
@@ -163,6 +165,7 @@ sleep 5
 echo -e "\nCreating joinchannel job"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/join_channel.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/join_channel.yaml
+sleep 20
 
 JOBSTATUS=$(kubectl get jobs |grep joinchannel |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
@@ -182,6 +185,7 @@ sleep 5
 echo -e "\nCreating installchaincode job"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_install.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_install.yaml
+sleep 20
 
 JOBSTATUS=$(kubectl get jobs |grep chaincodeinstall |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
@@ -201,6 +205,7 @@ sleep 5
 echo -e "\nCreating chaincodeinstantiate job"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_instantiate.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_instantiate.yaml
+sleep 20
 
 JOBSTATUS=$(kubectl get jobs |grep chaincodeinstantiate |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
