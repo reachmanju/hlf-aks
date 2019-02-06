@@ -18,7 +18,7 @@ spec:
       - name: chaincodeinstallnode1
         image: hyperledger/fabric-tools:1.2.1
         imagePullPolicy: Always
-        command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -l node -p fabcar/"]
+        command: ["sh", "-c", "peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -l node -p /shared/artifacts/chaincode/fabcar/"]
         env:
         - name: CHAINCODE_NAME
           value: "nodecc"
@@ -41,7 +41,7 @@ spec:
       - name: chaincodeinstallnode2
         image: hyperledger/fabric-tools:1.2.1
         imagePullPolicy: Always
-        command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -l node -p fabcar/"]
+        command: ["sh", "-c", "peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -l node -p /shared/artifacts/chaincode/fabcar/"]
         env:
         - name: CHAINCODE_NAME
           value: "nodecc"
