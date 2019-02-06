@@ -14,6 +14,7 @@ let Chaincode = class {
   // Best practice is to have any Ledger initialization in separate function -- see initLedger()
   async Init(stub) {
     console.info('=========== Instantiated fabcar chaincode ===========');
+    initLedger(stub);
     return shim.success();
   }
 
