@@ -31,6 +31,7 @@ fi
 echo -e "\nCreating Copy artifacts job."
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/copyArtifactsJob.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/copyArtifactsJob.yaml
+sleep 10
 
 pod=$(kubectl get pods --selector=job-name=copyartifacts --output=jsonpath={.items..metadata.name})
 podSTATUS=$(kubectl get pods --selector=job-name=copyartifacts --output=jsonpath={.items..phase})
@@ -52,7 +53,7 @@ echo -e "\nStarting to copy artifacts in persistent volume."
 kubectl cp ./artifacts $pod:/shared/
 
 echo "Waiting for 10 more seconds for copying artifacts to avoid any network delay"
-sleep 10
+sleep 15
 JOBSTATUS=$(kubectl get jobs |grep "copyartifacts" |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
     echo "Waiting for copyartifacts job to complete"
@@ -73,12 +74,25 @@ echo -e "\nGenerating the required artifacts for Blockchain network"
 
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/cryptogen.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/cryptogen.yaml
-sleep 35
+sleep 25
+JOBSTATUS=$(kubectl get jobs |grep cryptogen|awk '{print $2}')
+while [ "${JOBSTATUS}" != "1/1" ]; do
+    echo "Waiting for cryptogen job to complete"
+    sleep 1;
+    # UTILSLEFT=$(kubectl get pods | grep utils | awk '{print $2}')
+    UTILSSTATUS=$(kubectl get pods | grep "cryptogen" | awk '{print $3}')
+    if [ "${UTILSSTATUS}" == "Error" ]; then
+            echo "There is an error in configtxgen job. Please check logs."
+            exit 1
+    fi
+    # UTILSLEFT=$(kubectl get pods | grep cryptogen | awk '{print $2}')
+    JOBSTATUS=$(kubectl get jobs |grep cryptogen|awk '{print $2}')
+done
 
 # Genesis Block
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/configtxgen.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/configtxgen.yaml
-sleep 25
+sleep 15
 JOBSTATUS=$(kubectl get jobs |grep configtxgen|awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
     echo "Waiting for configtxgen job to complete"
@@ -135,8 +149,6 @@ sleep 10
 echo -e "\nCreating Services for blockchain network"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/blockchain-services.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/blockchain-services.yaml
-
-echo "Waiting for 15 seconds for peers and orderer to settle"
 sleep 10
 
 
@@ -144,10 +156,10 @@ sleep 10
 echo -e "\nCreating channel transaction artifact and a channel"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/create_channel.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/create_channel.yaml
-sleep 20
+sleep 25
 
 JOBSTATUS=$(kubectl get jobs |grep createchannel |awk '{print $2}')
-while [ "${JOBSTATUS}" != "1/1" ]; do
+while [ "${JOBSTATUS}" != "1/1 1/1" ]; do
     echo "Waiting for createchannel job to be completed"
     sleep 1;
     if [ "$(kubectl get pods | grep createchannel | awk '{print $3}')" == "Error" ]; then
@@ -158,14 +170,12 @@ while [ "${JOBSTATUS}" != "1/1" ]; do
 done
 echo "Create Channel Completed Successfully"
 
-sleep 5
-
 
 # Join all peers on a channel
 echo -e "\nCreating joinchannel job"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/join_channel.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/join_channel.yaml
-sleep 20
+sleep 25
 
 JOBSTATUS=$(kubectl get jobs |grep joinchannel |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
@@ -179,13 +189,11 @@ while [ "${JOBSTATUS}" != "1/1" ]; do
 done
 echo "Join Channel Completed Successfully"
 
-sleep 5
-
 # Install chaincode on each peer
 echo -e "\nCreating installchaincode job"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_install.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_install.yaml
-sleep 20
+sleep 25
 
 JOBSTATUS=$(kubectl get jobs |grep chaincodeinstall |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
@@ -199,13 +207,11 @@ while [ "${JOBSTATUS}" != "1/1" ]; do
 done
 echo "Chaincode Install Completed Successfully"
 
-sleep 5
-
 # Instantiate chaincode on channel
 echo -e "\nCreating chaincodeinstantiate job"
 echo "Running: kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_instantiate.yaml"
 kubectl create -f ${KUBECONFIG_FOLDER}/chaincode_instantiate.yaml
-sleep 20
+sleep 25
 
 JOBSTATUS=$(kubectl get jobs |grep chaincodeinstantiate |awk '{print $2}')
 while [ "${JOBSTATUS}" != "1/1" ]; do
